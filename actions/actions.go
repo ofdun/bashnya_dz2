@@ -118,40 +118,12 @@ func DefaultMode(opt settings.Options, input []string) []string {
 	return output
 }
 
-//func binarySearch(array []int, num int) bool {
-//	l, r := 0, len(array)
-//	answer := false
-//	var m int
-//	for {
-//		if l >= r {
-//			return answer
-//		}
-//		m = (l + r) / 2
-//		if num > array[m] {
-//			l = m + 1
-//		} else if num < array[m] {
-//			r = m
-//		} else {
-//			answer = true
-//			return answer
-//		}
-//	}
-//}
-
-//func contains(slice []string, substr string) bool {
-//	for _, a := range slice {
-//		if a == substr {
-//			return true
-//		}
-//	}
-//	return false
-//}
-
-func DetectDuplicateStrings(opt settings.Options, input []string) []string {
-	// TODO combine DetectDuplicateStrings and DetectUnique due to same structure
+// stringsIndexesCounter returns a hashmap of strings and their count
+func stringsIndexesCounter(opt settings.Options, input []string) map[string]struct {
+	count int
+	index int
+} {
 	var c int
-	indexes := make([]int, 0)
-	output := make([]string, 0)
 	counter := make(map[string]struct {
 		count int
 		index int
@@ -191,6 +163,15 @@ func DetectDuplicateStrings(opt settings.Options, input []string) []string {
 			}{count: 2, index: counter[stringified].index}
 		}
 	}
+	return counter
+}
+
+func DetectDuplicateStrings(opt settings.Options, input []string) []string {
+	indexes := make([]int, 0)
+	output := make([]string, 0)
+
+	counter := stringsIndexesCounter(opt, input)
+
 	for _, s := range counter {
 		if s.count > 1 {
 			indexes = append(indexes, s.index)
@@ -204,48 +185,11 @@ func DetectDuplicateStrings(opt settings.Options, input []string) []string {
 }
 
 func DetectUniqueStrings(opt settings.Options, input []string) []string {
-	var c int
 	indexes := make([]int, 0)
 	output := make([]string, 0)
-	counter := make(map[string]struct {
-		count int
-		index int
-	})
-	f, charsToSkip := opt.SkipFields, opt.SkipChars
-	for i, line := range input {
-		splitLine := make([]string, 0)
-		if opt.IgnoreCase {
-			splitLine = strings.Split(strings.ToLower(line), " ")
-		} else {
-			splitLine = strings.Split(line, " ")
-		}
-		if f < len(splitLine) {
-			splitLine = splitLine[f:]
-		}
-		stringified := ""
-		c = charsToSkip
-		for _, field := range splitLine {
-			for _, elem := range field {
-				if c == 0 {
-					stringified += string(elem)
-				} else {
-					c--
-				}
-			}
-			stringified += " "
-		}
-		if _, exists := counter[stringified]; !exists {
-			counter[stringified] = struct {
-				count int
-				index int
-			}{count: 1, index: i}
-		} else {
-			counter[stringified] = struct {
-				count int
-				index int
-			}{count: 2, index: counter[stringified].index}
-		}
-	}
+
+	counter := stringsIndexesCounter(opt, input)
+
 	for _, s := range counter {
 		if s.count == 1 {
 			indexes = append(indexes, s.index)
