@@ -7,7 +7,7 @@ import (
 
 type Options struct {
 	Count        bool
-	Doubled      bool
+	Duplicated   bool
 	Unique       bool
 	SkipFields   int
 	SkipChars    int
@@ -18,13 +18,6 @@ type Options struct {
 	OutputFile   string
 }
 
-func NewOptions(c, d, u, i, stdin, stdout bool,
-	skipf, skipc int,
-	inputfile, outputfile string) Options {
-	return Options{c, d, u, skipf, skipc,
-		i, stdin, stdout, inputfile, outputfile}
-}
-
 func InitOptions() (*Options, error) {
 	countPtr := flag.Bool("c", false, "Count number of each string and output them")
 	doubledPtr := flag.Bool("d", false, "Output only duplicated lines")
@@ -33,9 +26,8 @@ func InitOptions() (*Options, error) {
 	skipCPtr := flag.Int("s", 0, "Doesn't count first n chars in a string")
 	ignorePtr := flag.Bool("i", false, "Ignore case")
 	stdin := true
-	inputFilePath := "stdin"
 	stdout := true
-	outputFilePath := "stdout"
+	var inputFilePath, outputFilePath string
 
 	flag.Parse()
 	if flag.NArg() == 1 {
@@ -55,8 +47,8 @@ func InitOptions() (*Options, error) {
 		return nil, errors.New("Invalid input! -с, -d and -u are interchangeable! ")
 	}
 
-	opt := NewOptions(c, d, u, *ignorePtr, stdin, stdout,
-		*skipfPtr, *skipCPtr, inputFilePath, outputFilePath)
+	opt := Options{c, d, u, *skipfPtr, *skipCPtr, *ignorePtr,
+		stdin, stdout, inputFilePath, outputFilePath}
 
 	return &opt, nil
 	//return initOptions(c, d, u, *skipfPtr, *skipCPtr, *ignorePtr), nil

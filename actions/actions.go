@@ -118,17 +118,16 @@ func DefaultMode(opt settings.Options, input []string) []string {
 	return output
 }
 
-// stringsIndexesCounter returns a hashmap of strings and their count
-func stringsIndexesCounter(opt settings.Options, input []string) map[string]struct {
+type Counter struct {
 	count int
 	index int
-} {
+}
+
+// inputIndexCounter returns a hashmap of strings and their count
+func inputIndexCounter(opt settings.Options, input []string) map[string]Counter {
 	var c int
 	var splitLine []string
-	counter := make(map[string]struct {
-		count int
-		index int
-	})
+	counter := make(map[string]Counter)
 	f, charsToSkip := opt.SkipFields, opt.SkipChars
 	for i, line := range input {
 		if opt.IgnoreCase {
@@ -152,15 +151,9 @@ func stringsIndexesCounter(opt settings.Options, input []string) map[string]stru
 			stringified += " "
 		}
 		if _, exists := counter[stringified]; !exists {
-			counter[stringified] = struct {
-				count int
-				index int
-			}{count: 1, index: i}
+			counter[stringified] = Counter{count: 1, index: i}
 		} else {
-			counter[stringified] = struct {
-				count int
-				index int
-			}{count: 2, index: counter[stringified].index}
+			counter[stringified] = Counter{count: 2, index: counter[stringified].index}
 		}
 	}
 	return counter
@@ -170,7 +163,7 @@ func DetectDuplicateStrings(opt settings.Options, input []string) []string {
 	indexes := make([]int, 0)
 	output := make([]string, 0)
 
-	counter := stringsIndexesCounter(opt, input)
+	counter := inputIndexCounter(opt, input)
 
 	for _, s := range counter {
 		if s.count > 1 {
@@ -188,7 +181,7 @@ func DetectUniqueStrings(opt settings.Options, input []string) []string {
 	indexes := make([]int, 0)
 	output := make([]string, 0)
 
-	counter := stringsIndexesCounter(opt, input)
+	counter := inputIndexCounter(opt, input)
 
 	for _, s := range counter {
 		if s.count == 1 {
