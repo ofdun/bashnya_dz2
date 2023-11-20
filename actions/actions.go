@@ -78,9 +78,9 @@ func UniqueStringsIndexes(opt settings.Options, input []string) []int {
 	var c int
 	indexes := make([]int, 0)
 	hashset := make(map[string]struct{})
+	var splitLine []string
 	f, charsToSkip := opt.SkipFields, opt.SkipChars
 	for i, line := range input {
-		splitLine := make([]string, 0)
 		if opt.IgnoreCase {
 			splitLine = strings.Split(strings.ToLower(line), " ")
 		} else {
@@ -124,13 +124,13 @@ func stringsIndexesCounter(opt settings.Options, input []string) map[string]stru
 	index int
 } {
 	var c int
+	var splitLine []string
 	counter := make(map[string]struct {
 		count int
 		index int
 	})
 	f, charsToSkip := opt.SkipFields, opt.SkipChars
 	for i, line := range input {
-		splitLine := make([]string, 0)
 		if opt.IgnoreCase {
 			splitLine = strings.Split(strings.ToLower(line), " ")
 		} else {

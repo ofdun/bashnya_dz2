@@ -52,7 +52,7 @@ func InitOptions() (*Options, error) {
 	d := *doubledPtr
 	u := *uniquePtr
 	if (c && (d || u)) || (d && (c || u)) || (u && (c || d)) {
-		return nil, errors.New("invalid input")
+		return nil, errors.New("Invalid input! -с, -d and -u are interchangeable! ")
 	}
 
 	opt := NewOptions(c, d, u, *ignorePtr, stdin, stdout,

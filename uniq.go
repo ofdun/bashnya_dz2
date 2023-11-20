@@ -15,7 +15,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	output := make([]string, 0)
+	var output []string
 	if opt.Doubled {
 		output = actions.DetectDuplicateStrings(*opt, input)
 	} else if opt.Unique {
