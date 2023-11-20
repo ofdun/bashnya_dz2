@@ -21,7 +21,7 @@ func main() {
 	} else if opt.Unique {
 		output = actions.DetectUniqueStrings(*opt, input)
 	} else if opt.Count {
-		output = actions.CountSubstringsInInput(*opt, input)
+		output = actions.CountStringsInInput(*opt, input)
 	} else {
 		output = actions.DefaultMode(*opt, input)
 	}

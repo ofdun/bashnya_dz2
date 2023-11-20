@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"uniq/m/settings"
@@ -72,7 +73,7 @@ func Input(opt settings.Options) ([]string, error) {
 	return output, nil
 }
 
-// UniqueStringsIndexes returns indexes of strings in input u need to output
+// UniqueStringsIndexes returns indexes of strings in options u need to output
 func UniqueStringsIndexes(opt settings.Options, input []string) []int {
 	var c int
 	indexes := make([]int, 0)
@@ -89,8 +90,8 @@ func UniqueStringsIndexes(opt settings.Options, input []string) []int {
 			splitLine = splitLine[f:]
 		}
 		stringified := ""
+		c = charsToSkip
 		for _, field := range splitLine {
-			c = charsToSkip
 			for _, elem := range field {
 				if c == 0 {
 					stringified += string(elem)
@@ -117,55 +118,46 @@ func DefaultMode(opt settings.Options, input []string) []string {
 	return output
 }
 
-func binarySearch(array []int, num int) bool {
-	l, r := 0, len(array)
-	answer := false
-	var m int
-	for {
-		if l >= r {
-			return answer
-		}
-		m = (l + r) / 2
-		if num > array[m] {
-			l = m + 1
-		} else if num < array[m] {
-			r = m
-		} else {
-			answer = true
-			return answer
-		}
-	}
-}
+//func binarySearch(array []int, num int) bool {
+//	l, r := 0, len(array)
+//	answer := false
+//	var m int
+//	for {
+//		if l >= r {
+//			return answer
+//		}
+//		m = (l + r) / 2
+//		if num > array[m] {
+//			l = m + 1
+//		} else if num < array[m] {
+//			r = m
+//		} else {
+//			answer = true
+//			return answer
+//		}
+//	}
+//}
 
-func contains(slice []string, substr string) bool {
-	for _, a := range slice {
-		if a == substr {
-			return true
-		}
-	}
-	return false
-}
+//func contains(slice []string, substr string) bool {
+//	for _, a := range slice {
+//		if a == substr {
+//			return true
+//		}
+//	}
+//	return false
+//}
 
 func DetectDuplicateStrings(opt settings.Options, input []string) []string {
-	output := make([]string, 0)
-	indexes := UniqueStringsIndexes(opt, input)
-	for i := 0; i < len(input); i++ {
-		exists := binarySearch(indexes, i)
-		if !exists {
-			if !contains(output, input[i]) {
-				output = append(output, input[i])
-			}
-		}
-	}
-	return output
-}
-
-func DetectUniqueStrings(opt settings.Options, input []string) []string {
+	// TODO combine DetectDuplicateStrings and DetectUnique due to same structure
 	var c int
+	indexes := make([]int, 0)
 	output := make([]string, 0)
-	counter := make(map[string]int)
+	counter := make(map[string]struct {
+		count int
+		index int
+	})
 	f, charsToSkip := opt.SkipFields, opt.SkipChars
-	for _, line := range input {
+	for i, line := range input {
 		splitLine := make([]string, 0)
 		if opt.IgnoreCase {
 			splitLine = strings.Split(strings.ToLower(line), " ")
@@ -176,8 +168,8 @@ func DetectUniqueStrings(opt settings.Options, input []string) []string {
 			splitLine = splitLine[f:]
 		}
 		stringified := ""
+		c = charsToSkip
 		for _, field := range splitLine {
-			c = charsToSkip
 			for _, elem := range field {
 				if c == 0 {
 					stringified += string(elem)
@@ -188,20 +180,85 @@ func DetectUniqueStrings(opt settings.Options, input []string) []string {
 			stringified += " "
 		}
 		if _, exists := counter[stringified]; !exists {
-			counter[stringified] = 1
+			counter[stringified] = struct {
+				count int
+				index int
+			}{count: 1, index: i}
 		} else {
-			counter[stringified] += 1
+			counter[stringified] = struct {
+				count int
+				index int
+			}{count: 2, index: counter[stringified].index}
 		}
 	}
-	for k, v := range counter {
-		if v == 1 {
-			output = append(output, k)
+	for _, s := range counter {
+		if s.count > 1 {
+			indexes = append(indexes, s.index)
 		}
+	}
+	sort.Ints(indexes)
+	for _, index := range indexes {
+		output = append(output, input[index])
 	}
 	return output
 }
 
-func CountSubstringsInInput(opt settings.Options, input []string) []string {
+func DetectUniqueStrings(opt settings.Options, input []string) []string {
+	var c int
+	indexes := make([]int, 0)
+	output := make([]string, 0)
+	counter := make(map[string]struct {
+		count int
+		index int
+	})
+	f, charsToSkip := opt.SkipFields, opt.SkipChars
+	for i, line := range input {
+		splitLine := make([]string, 0)
+		if opt.IgnoreCase {
+			splitLine = strings.Split(strings.ToLower(line), " ")
+		} else {
+			splitLine = strings.Split(line, " ")
+		}
+		if f < len(splitLine) {
+			splitLine = splitLine[f:]
+		}
+		stringified := ""
+		c = charsToSkip
+		for _, field := range splitLine {
+			for _, elem := range field {
+				if c == 0 {
+					stringified += string(elem)
+				} else {
+					c--
+				}
+			}
+			stringified += " "
+		}
+		if _, exists := counter[stringified]; !exists {
+			counter[stringified] = struct {
+				count int
+				index int
+			}{count: 1, index: i}
+		} else {
+			counter[stringified] = struct {
+				count int
+				index int
+			}{count: 2, index: counter[stringified].index}
+		}
+	}
+	for _, s := range counter {
+		if s.count == 1 {
+			indexes = append(indexes, s.index)
+		}
+	}
+	sort.Ints(indexes)
+	for _, index := range indexes {
+		output = append(output, input[index])
+	}
+	return output
+}
+
+func CountStringsInInput(opt settings.Options, input []string) []string {
 	output := make([]string, 0)
 	count := 0
 	indexesOfUnique := UniqueStringsIndexes(opt, input)

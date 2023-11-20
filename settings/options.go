@@ -18,6 +18,13 @@ type Options struct {
 	OutputFile   string
 }
 
+func NewOptions(c, d, u, i, stdin, stdout bool,
+	skipf, skipc int,
+	inputfile, outputfile string) Options {
+	return Options{c, d, u, skipf, skipc,
+		i, stdin, stdout, inputfile, outputfile}
+}
+
 func InitOptions() (*Options, error) {
 	countPtr := flag.Bool("c", false, "Count number of each string and output them")
 	doubledPtr := flag.Bool("d", false, "Output only duplicated lines")
@@ -48,18 +55,8 @@ func InitOptions() (*Options, error) {
 		return nil, errors.New("invalid input")
 	}
 
-	opt := Options{
-		Count:        c,
-		Doubled:      d,
-		Unique:       u,
-		SkipFields:   *skipfPtr,
-		SkipChars:    *skipCPtr,
-		IgnoreCase:   *ignorePtr,
-		StdinInput:   stdin,
-		StdoutOutput: stdout,
-		InputFile:    inputFilePath,
-		OutputFile:   outputFilePath,
-	}
+	opt := NewOptions(c, d, u, *ignorePtr, stdin, stdout,
+		*skipfPtr, *skipCPtr, inputFilePath, outputFilePath)
 
 	return &opt, nil
 	//return initOptions(c, d, u, *skipfPtr, *skipCPtr, *ignorePtr), nil
