@@ -3,11 +3,11 @@ package main
 import (
 	"uniq/m/actions"
 	"uniq/m/io"
-	"uniq/m/settings"
+	"uniq/m/options"
 )
 
 func main() {
-	opt, ioOpt, err := settings.InitOptions()
+	opt, ioOpt, err := options.InitOptions()
 	if err != nil {
 		panic(err)
 	}

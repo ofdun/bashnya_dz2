@@ -4,11 +4,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"uniq/m/settings"
+	"uniq/m/options"
 )
 
 // UniqueStringsIndexes returns indexes of strings in options u need to output
-func UniqueStringsIndexes(opt settings.Options, input []string) []int {
+func UniqueStringsIndexes(opt options.Options, input []string) []int {
 	var c int
 	indexes := make([]int, 0)
 	hashset := make(map[string]struct{})
@@ -43,7 +43,7 @@ func UniqueStringsIndexes(opt settings.Options, input []string) []int {
 	return indexes
 }
 
-func DefaultMode(opt settings.Options, input []string) []string {
+func DefaultMode(opt options.Options, input []string) []string {
 	output := make([]string, 0)
 	indexes := UniqueStringsIndexes(opt, input)
 	for _, i := range indexes {
@@ -58,7 +58,7 @@ type Counter struct {
 }
 
 // inputIndexCounter returns a hashmap of strings and their count
-func inputIndexCounter(opt settings.Options, input []string) map[string]Counter {
+func inputIndexCounter(opt options.Options, input []string) map[string]Counter {
 	var c int
 	var splitLine []string
 	counter := make(map[string]Counter)
@@ -93,7 +93,7 @@ func inputIndexCounter(opt settings.Options, input []string) map[string]Counter 
 	return counter
 }
 
-func DetectDuplicateStrings(opt settings.Options, input []string) []string {
+func DetectDuplicateStrings(opt options.Options, input []string) []string {
 	indexes := make([]int, 0)
 	output := make([]string, 0)
 
@@ -111,7 +111,7 @@ func DetectDuplicateStrings(opt settings.Options, input []string) []string {
 	return output
 }
 
-func DetectUniqueStrings(opt settings.Options, input []string) []string {
+func DetectUniqueStrings(opt options.Options, input []string) []string {
 	indexes := make([]int, 0)
 	output := make([]string, 0)
 
@@ -129,7 +129,7 @@ func DetectUniqueStrings(opt settings.Options, input []string) []string {
 	return output
 }
 
-func CountStringsInInput(opt settings.Options, input []string) []string {
+func CountStringsInInput(opt options.Options, input []string) []string {
 	output := make([]string, 0)
 	count := 0
 	indexesOfUnique := UniqueStringsIndexes(opt, input)

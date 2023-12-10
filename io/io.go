@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"uniq/m/settings"
+	"uniq/m/options"
 )
 
-func Input(opt settings.IoOptions) ([]string, error) {
+func Input(opt options.IoOptions) ([]string, error) {
 	var output []string
 	var reader io.Reader
 	if opt.StdinInput {
@@ -40,7 +40,7 @@ func Input(opt settings.IoOptions) ([]string, error) {
 	return output, nil
 }
 
-func Output(opt settings.IoOptions, output []string) error {
+func Output(opt options.IoOptions, output []string) error {
 	var outputStream io.Writer
 	if opt.StdoutOutput {
 		outputStream = os.Stdout
