@@ -2,19 +2,21 @@ package main
 
 import (
 	"uniq/m/actions"
+	"uniq/m/io"
 	"uniq/m/settings"
 )
 
 func main() {
-	opt, err := settings.InitOptions()
+	opt, ioOpt, err := settings.InitOptions()
 	if err != nil {
 		panic(err)
 	}
 
-	input, err := actions.Input(*opt)
+	input, err := io.Input(*ioOpt)
 	if err != nil {
 		panic(err)
 	}
+
 	var output []string
 	if opt.Duplicated {
 		output = actions.DetectDuplicateStrings(*opt, input)
@@ -26,7 +28,7 @@ func main() {
 		output = actions.DefaultMode(*opt, input)
 	}
 
-	if err = actions.Output(*opt, output); err != nil {
+	if err = io.Output(*ioOpt, output); err != nil {
 		panic(err)
 	}
 }
