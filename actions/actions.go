@@ -1,77 +1,11 @@
 package actions
 
 import (
-	"bufio"
-	"errors"
-	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"uniq/m/settings"
 )
-
-func Output(opt settings.Options, output []string) error {
-	if opt.StdoutOutput {
-		for _, line := range output {
-			fmt.Println(line)
-		}
-	} else {
-		f, err := os.Create(opt.OutputFile)
-		if err != nil {
-			return err
-		}
-		defer func() {
-			if err = f.Close(); err != nil {
-				panic(err)
-			}
-		}()
-		for _, line := range output {
-			_, err = f.WriteString(line + "\n")
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func Input(opt settings.Options) ([]string, error) {
-	var output []string
-
-	if !opt.StdinInput {
-		reader, err := os.Open(opt.InputFile)
-
-		if err != nil {
-			return output, errors.New("Invalid input file: " + opt.InputFile)
-		}
-
-		defer func() {
-			if err = reader.Close(); err != nil {
-				panic(err)
-			}
-		}()
-		scanner := bufio.NewScanner(reader)
-		for scanner.Scan() {
-			output = append(output, scanner.Text())
-		}
-
-		if err = scanner.Err(); err != nil {
-			return output, err
-		}
-	} else {
-		reader := os.Stdin
-		scanner := bufio.NewScanner(reader)
-		for scanner.Scan() {
-			output = append(output, scanner.Text())
-		}
-
-		if err := scanner.Err(); err != nil {
-			return output, err
-		}
-	}
-	return output, nil
-}
 
 // UniqueStringsIndexes returns indexes of strings in options u need to output
 func UniqueStringsIndexes(opt settings.Options, input []string) []int {
