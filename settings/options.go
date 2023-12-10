@@ -6,19 +6,22 @@ import (
 )
 
 type Options struct {
-	Count        bool
-	Duplicated   bool
-	Unique       bool
-	SkipFields   int
-	SkipChars    int
-	IgnoreCase   bool
+	Count      bool
+	Duplicated bool
+	Unique     bool
+	SkipFields int
+	SkipChars  int
+	IgnoreCase bool
+}
+
+type IoOptions struct {
 	StdinInput   bool
 	StdoutOutput bool
 	InputFile    string
 	OutputFile   string
 }
 
-func InitOptions() (*Options, error) {
+func InitOptions() (*Options, *IoOptions, error) {
 	countPtr := flag.Bool("c", false, "Count number of each string and output them")
 	doubledPtr := flag.Bool("d", false, "Output only duplicated lines")
 	uniquePtr := flag.Bool("u", false, "Output only unique lines")
@@ -44,12 +47,11 @@ func InitOptions() (*Options, error) {
 	d := *doubledPtr
 	u := *uniquePtr
 	if (c && (d || u)) || (d && (c || u)) || (u && (c || d)) {
-		return nil, errors.New("Invalid input! -с, -d and -u are interchangeable! ")
+		return nil, nil, errors.New("Invalid input! -с, -d and -u are interchangeable! ")
 	}
 
-	opt := Options{c, d, u, *skipfPtr, *skipCPtr, *ignorePtr,
-		stdin, stdout, inputFilePath, outputFilePath}
+	opt := Options{c, d, u, *skipfPtr, *skipCPtr, *ignorePtr}
+	ioOpt := IoOptions{stdin, stdout, inputFilePath, outputFilePath}
 
-	return &opt, nil
-	//return initOptions(c, d, u, *skipfPtr, *skipCPtr, *ignorePtr), nil
+	return &opt, &ioOpt, nil
 }
